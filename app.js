@@ -16,9 +16,9 @@ let UIController = (function () {
     return {
         getInput: function () {
             return {
-                type: document.querySelector('.add__type').value, // Will be either inc or exp
-                description: document.querySelector('.add__description').value,
-                value: document.querySelector('.add__value').value,
+                type: document.querySelector(DOMstrings.inputType).value, // Will be either inc or exp
+                description: document.querySelector(DOMstrings.inputDescription).value,
+                value: document.querySelector(DOMstrings.inputValue).value,
             };
         },
 
@@ -31,6 +31,16 @@ let UIController = (function () {
 
 // GLOBAL APP CONTROLLER
 let controller = (function (budgetCtrl, UICtrl) {
+
+    let setupEventListeners = function() {
+        document.querySelector(DOM.inputBtn).addEventListener('click', ctrlAddItem);
+
+        document.addEventListener('keypress', function (event) {
+            if (event.keyCode === 13 || event.which === 13) {
+                ctrlAddItem();
+            }
+        });
+    };
 
     let DOM = UICtrl.getDOMstrings();
 
@@ -52,13 +62,13 @@ let controller = (function (budgetCtrl, UICtrl) {
         console.log('It works.')
     }
 
-    document.querySelector(DOM.inputBtn).addEventListener('click', ctrlAddItem);
-
-    document.addEventListener('keypress', function (event) {
-        if (event.keyCode === 13 || event.which === 13) {
-            ctrlAddItem();
+    return {
+        init: function(){
+            console.log('Application has started.');
+            setupEventListeners();
         }
-
-    })
+    }
 
 })(budgetController, UIController);
+
+controller.init();
