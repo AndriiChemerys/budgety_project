@@ -74,9 +74,10 @@ let UIController = (function () {
             return {
                 type: document.querySelector(DOMstrings.inputType).value, // Will be either inc or exp
                 description: document.querySelector(DOMstrings.inputDescription).value,
-                value: document.querySelector(DOMstrings.inputValue).value,
+                value: parseFloat(document.querySelector(DOMstrings.inputValue).value)
             };
         },
+        
 
         addListItem: function (obj, type) {
             // Create HTML string with placeholder text
@@ -98,13 +99,27 @@ let UIController = (function () {
 
             // Replace the placeholder text with some actual data
 
-            newHtml=html.replace('%id%', obj.id);
-            newHtml=newHtml.replace('%description%', obj.description);
-            newHtml=newHtml.replace('%value%', obj.value);
+            newHtml = html.replace('%id%', obj.id);
+            newHtml = newHtml.replace('%description%', obj.description);
+            newHtml = newHtml.replace('%value%', obj.value);
 
             // Insert the HTML into the DOM
 
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+        },
+
+        clearFields: function () {
+            let fields, fieldsArr;
+
+            fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+
+            fieldsArr = Array.prototype.slice.call(fields);
+
+            fieldsArr.forEach(function (current, index, array) {
+                current.value = "";
+            });
+
+            fieldsArr[0].focus();
         },
 
         getDOMstrings: function () {
@@ -129,6 +144,15 @@ let controller = (function (budgetCtrl, UICtrl) {
 
     let DOM = UICtrl.getDOMstrings();
 
+    let updateBudget = function () {
+        // 1. Calculate the budget
+
+        // 2. Return the budget
+
+        // 3. Display the budget on the UI
+
+    };
+
     let ctrlAddItem = function () {
         let input, newItem;
         // 1. Get the filed input data
@@ -136,17 +160,24 @@ let controller = (function (budgetCtrl, UICtrl) {
         input = UICtrl.getInput();
         console.log(input);
 
-        // 2. Add the item to the budget controller
-        newItem = budgetCtrl.addItem(input.type, input.description, input.value);
+        if (input.description !== "" && !isNaN(input.value) && input.value > 0) {
 
-        // 3. Add the item to the UI
-        UICtrl.addListItem(newItem, input.type);
-        // 4. Calculate the budget
+            // 2. Add the item to the budget controller
+            newItem = budgetCtrl.addItem(input.type, input.description, input.value);
 
-        // 5. Display the budget on the UI
+            // 3. Add the item to the UI
+            UICtrl.addListItem(newItem, input.type);
+
+            // 4. Clear the fields
+            UICtrl.clearFields();
+
+            // 5. Calculate and update budget
+            updateBudget();
+
+        }
 
         console.log('It works.')
-    }
+    };
 
     return {
         init: function () {
