@@ -54,7 +54,7 @@ let budgetController = (function () {
 
     return {
         addItem: function(type, des, val) {
-            var newItem, ID;
+            let newItem, ID;
             
             //[1 2 3 4 5], next ID = 6
             //[1 2 4 6 8], next ID = 9
@@ -82,7 +82,7 @@ let budgetController = (function () {
         },
 
         deleteItem: function(type, id) {
-            var ids, index;
+            let ids, index;
             
             // id = 6
             //data.allItems[type][id];
@@ -139,7 +139,7 @@ let budgetController = (function () {
         },
 
         getPercentages: function() {
-            var allPerc = data.allItems.exp.map(function(cur) {
+            let allPerc = data.allItems.exp.map(function(cur) {
                 return cur.getPercentage();
             });
             return allPerc;
@@ -167,7 +167,7 @@ let budgetController = (function () {
 
 let UIController = (function () {
 
-    var DOMstrings = {
+    let DOMstrings = {
         inputType: '.add__type',
         inputDescription: '.add__description',
         inputValue: '.add__value',
@@ -183,8 +183,8 @@ let UIController = (function () {
         dateLabel: '.budget__title--month'
     };
 
-    var formatNumber = function(num, type) {
-        var numSplit, int, dec, type;
+    let formatNumber = function(num, type) {
+        let numSplit, int, dec, type;
         /*
             + or - before number
             exactly 2 decimal points
@@ -227,7 +227,7 @@ let UIController = (function () {
 
 
         addListItem: function(obj, type) {
-            var html, newHtml, element;
+            let html, newHtml, element;
             // Create HTML string with placeholder text
             
             if (type === 'inc') {
@@ -251,7 +251,7 @@ let UIController = (function () {
 
         deleteListItem: function(selectorID) {
             
-            var el = document.getElementById(selectorID);
+            let el = document.getElementById(selectorID);
             el.parentNode.removeChild(el);
             
         },
@@ -305,7 +305,7 @@ let UIController = (function () {
             let now, months, month, year;
             
             now = new Date();
-            //var christmas = new Date(2016, 11, 25);
+            //let christmas = new Date(2016, 11, 25);
             
             months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             month = now.getMonth();
@@ -317,7 +317,7 @@ let UIController = (function () {
         
         changedType: function() {
             
-            var fields = document.querySelectorAll(
+            let fields = document.querySelectorAll(
                 DOMstrings.inputType + ',' +
                 DOMstrings.inputDescription + ',' +
                 DOMstrings.inputValue);
