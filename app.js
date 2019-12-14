@@ -184,7 +184,7 @@ let UIController = (function () {
     };
 
     let formatNumber = function(num, type) {
-        let numSplit, int, dec, type;
+        var numSplit, int, dec, type;
         /*
             + or - before number
             exactly 2 decimal points
