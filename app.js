@@ -37,29 +37,52 @@ let budgetController = (function () {
     };
 
     return {
-        addItem: function (type, des, val) {
-            let newItem, ID;
-
+        addItem: function(type, des, val) {
+            var newItem, ID;
+            
+            //[1 2 3 4 5], next ID = 6
+            //[1 2 4 6 8], next ID = 9
+            // ID = last ID + 1
+            
             // Create new ID
             if (data.allItems[type].length > 0) {
                 ID = data.allItems[type][data.allItems[type].length - 1].id + 1;
             } else {
                 ID = 0;
             }
-
-
+            
             // Create new item based on 'inc' or 'exp' type
             if (type === 'exp') {
                 newItem = new Expense(ID, des, val);
             } else if (type === 'inc') {
                 newItem = new Income(ID, des, val);
             }
-
+            
             // Push it into our data structure
             data.allItems[type].push(newItem);
-
+            
             // Return the new element
             return newItem;
+        },
+
+        deleteItem: function(type, id) {
+            var ids, index;
+            
+            // id = 6
+            //data.allItems[type][id];
+            // ids = [1 2 4  8]
+            //index = 3
+            
+            ids = data.allItems[type].map(function(current) {
+                return current.id;
+            });
+
+            index = ids.indexOf(id);
+
+            if (index !== -1) {
+                data.allItems[type].splice(index, 1);
+            }
+            
         },
 
         calculateBudget: function () {
@@ -101,22 +124,51 @@ let budgetController = (function () {
 // UI CONTROLLER
 let UIController = (function () {
 
-    let DOMstrings = {
+    var DOMstrings = {
         inputType: '.add__type',
         inputDescription: '.add__description',
         inputValue: '.add__value',
         inputBtn: '.add__btn',
         incomeContainer: '.income__list',
-        expensesContainer: '.exspenses__list',
+        expensesContainer: '.expenses__list',
         budgetLabel: '.budget__value',
         incomeLabel: '.budget__income--value',
         expensesLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
         container: '.container',
+        expensesPercLabel: '.item__percentage',
+        dateLabel: '.budget__title--month'
     };
 
+    var formatNumber = function(num, type) {
+        var numSplit, int, dec, type;
+        /*
+            + or - before number
+            exactly 2 decimal points
+            comma separating the thousands
+
+            2310.4567 -> + 2,310.46
+            2000 -> + 2,000.00
+            */
+
+        num = Math.abs(num);
+        num = num.toFixed(2);
+
+        numSplit = num.split('.');
+
+        int = numSplit[0];
+        if (int.length > 3) {
+            int = int.substr(0, int.length - 3) + ',' + int.substr(int.length - 3, 3); //input 23510, output 23,510
+        }
+
+        dec = numSplit[1];
+
+        return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
+
+    };
+    
     return {
-        getInput: function () {
+        getInput: function() {
             return {
                 type: document.querySelector(DOMstrings.inputType).value, // Will be either inc or exp
                 description: document.querySelector(DOMstrings.inputDescription).value,
@@ -125,33 +177,34 @@ let UIController = (function () {
         },
 
 
-        addListItem: function (obj, type) {
+        addListItem: function(obj, type) {
+            var html, newHtml, element;
             // Create HTML string with placeholder text
-
-            let html, newHtml;
-
+            
             if (type === 'inc') {
-
                 element = DOMstrings.incomeContainer;
-
-                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
-
+                
+                html = '<div class="item clearfix" id="inc-%id%"> <div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             } else if (type === 'exp') {
-
                 element = DOMstrings.expensesContainer;
-
-                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                
+                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
-
+            
             // Replace the placeholder text with some actual data
-
             newHtml = html.replace('%id%', obj.id);
             newHtml = newHtml.replace('%description%', obj.description);
-            newHtml = newHtml.replace('%value%', obj.value);
-
+            newHtml = newHtml.replace('%value%', formatNumber(obj.value, type));
+            
             // Insert the HTML into the DOM
-
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+        },
+
+        deleteListItem: function(selectorID) {
+            
+            var el = document.getElementById(selectorID);
+            el.parentNode.removeChild(el);
+            
         },
 
         clearFields: function () {
@@ -223,15 +276,13 @@ let controller = (function (budgetCtrl, UICtrl) {
 
     };
 
-    let ctrlAddItem = function () {
+    let ctrlAddItem = function() {
         let input, newItem;
-        // 1. Get the filed input data
-
-        input = UICtrl.getInput();
-        console.log(input);
-
+        
+        // 1. Get the field input data
+        input = UICtrl.getInput();        
+        
         if (input.description !== "" && !isNaN(input.value) && input.value > 0) {
-
             // 2. Add the item to the budget controller
             newItem = budgetCtrl.addItem(input.type, input.description, input.value);
 
@@ -243,34 +294,37 @@ let controller = (function (budgetCtrl, UICtrl) {
 
             // 5. Calculate and update budget
             updateBudget();
-
+            
+            // 6. Calculate and update percentages
+            updatePercentages();
         }
-
-        console.log('It works.')
     };
 
-    let ctrlDeleteItem = function(event){
-        console.log(event.target);
-        let itemID;
-
-        itemID = event.target.parentNode.parentNode.parentNode.parentNode;
-
-        if(itemID){
+    let ctrlDeleteItem = function(event) {
+        let itemID, splitID, type, ID;
         
-            //inc-1
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
         
-        splitID = itemID.split('-');
-        type = splitID[0];
-        ID = splitID[1];
-
-        // 1. Delete the item from the data structure
-
-        // 2. Delete the item from the UI
-
-        // 3. Update and shopw the new budget
+        if (itemID) {
             
+            //inc-1
+            splitID = itemID.split('-');
+            type = splitID[0];
+            ID = parseInt(splitID[1]);
+            
+            // 1. delete the item from the data structure
+            budgetCtrl.deleteItem(type, ID);
+            
+            // 2. Delete the item from the UI
+            UICtrl.deleteListItem(itemID);
+            
+            // 3. Update and show the new budget
+            updateBudget();
+            
+            // 4. Calculate and update percentages
+            updatePercentages();
         }
-    }
+    };
 
     return {
         init: function () {
