@@ -1,4 +1,7 @@
+//############################################
 // BUDGET CONTROLLER
+//############################################
+
 let budgetController = (function () {
 
     let Expense = function (id, description, value) {
@@ -158,7 +161,10 @@ let budgetController = (function () {
 
 })();
 
+//############################################
 // UI CONTROLLER
+//############################################
+
 let UIController = (function () {
 
     var DOMstrings = {
@@ -331,7 +337,10 @@ let UIController = (function () {
 
 })();
 
+//############################################
 // GLOBAL APP CONTROLLER
+//############################################
+
 let controller = (function (budgetCtrl, UICtrl) {
 
     let setupEventListeners = function () {
@@ -345,7 +354,7 @@ let controller = (function (budgetCtrl, UICtrl) {
 
         document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
 
-
+        document.querySelector(DOM.inputType).addEventListener('change', UICtrl.changedType);  
     };
 
     let DOM = UICtrl.getDOMstrings();
