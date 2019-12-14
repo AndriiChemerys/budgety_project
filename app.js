@@ -296,7 +296,7 @@ let UIController = (function () {
         },
 
         displayMonth: function() {
-            var now, months, month, year;
+            let now, months, month, year;
             
             now = new Date();
             //var christmas = new Date(2016, 11, 25);
@@ -429,19 +429,18 @@ let controller = (function (budgetCtrl, UICtrl) {
     };
 
     return {
-        init: function () {
+        init: function() {
             console.log('Application has started.');
-
+            UICtrl.displayMonth();
             UICtrl.displayBudget({
                 budget: 0,
                 totalInc: 0,
                 totalExp: 0,
-                // percentage: data.percentage
-            })
-
+                percentage: -1
+            });
             setupEventListeners();
         }
-    }
+    };
 
 })(budgetController, UIController);
 
